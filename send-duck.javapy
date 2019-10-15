@@ -1,0 +1,38 @@
+########## sends duck.png to myOutput.png ###########
+
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+public class Main
+{
+    public static void main (String[] args) throws IOException
+    {
+        var serverSocket = new ServerSocket (5555);
+
+        Socket clientSocket = serverSocket.accept ();
+
+        var in = clientSocket.getInputStream ();
+
+        FileOutputStream out = new FileOutputStream ("myOutput.png");
+
+        while (true) {
+            int b = in.read ();
+            if (b == -1) break;
+            out.write (b);
+        }
+
+        out.close ();
+    }
+}
+
+#####################
+
+import socket
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect(("localhost", 5555))
+
+bd = bytearray(open('duck.png', 'rb').read())
+
+s.send(bd)
