@@ -1,0 +1,40 @@
+<style>
+body { display: flex; justify-content: center }
+
+table {
+	table-layout: fixed;
+	border-collapse: collapse;
+	width: 50em
+}
+
+td { padding: 0.2em; border: 1px solid }
+
+a { text-decoration: none; color: #000 }
+</style>
+
+<script>
+function toggle(...selectors) {
+	for(let s of selectors) {
+		let a = document.querySelector(s).style
+		console.log(a)
+		if(a.display === 'none')
+			a.display = 'block'
+		else
+			a.display = 'none'
+	}
+}
+</script>
+
+<table>
+	<tr>
+		<td>sentence</td>
+		<td>
+			<a href="javascript:toggle('#hi', '#ih')">
+				<div>
+					<span id="hi">translation</span>
+					<span id="ih" style="display: none">the answer</span>
+				</div>
+			</a>
+		</td>
+	</tr>
+</table>

@@ -1,0 +1,28 @@
+<style>
+body { display: flex; justify-content: center }
+
+table {
+	table-layout: fixed;
+	border-collapse: collapse;
+	width: 50em
+}
+
+td { padding: 0.2em; border: 1px solid; vertical-align: top }
+
+div { height: 2em }
+
+a { text-decoration: none; color: #000 }
+</style>
+
+<script>
+function toggle(...selectors) {
+	for(let s of selectors) {
+		let a = document.querySelector(s).style
+		console.log(a)
+		if(a.display === 'none')
+			a.display = 'block'
+		else
+			a.display = 'none'
+	}
+}
+</script>
