@@ -1,4 +1,5 @@
 import re
+import random
 import urllib.request
 import urllib.error
 import os.path
@@ -63,6 +64,17 @@ def scurlExamples(word):
 		srcLang = p >> '"srcLang":"' > '"'
 		if src is None: break
 		examples.append((clean(src), clean(trg), srcLang))
+	return [(src, trg) for (src, trg, srcLang) in examples if srcLang == 'es']
+
+def get_examples(num, *words):
+	scurled = list()
+	for w in words:
+		scurled.append(scurlExamples(w))
+	examples = list()
+	for l in scurled:
+		random.shuffle(l)
+		examples.extend(l[0:min(num+1, len(l))])
+	random.shuffle(examples)
 	return examples
 
 def tag(dom, contents='', **kwargs):
@@ -79,4 +91,5 @@ def genws(examples):
 		)
 	header = open('header.html', 'r').read()
 	open('output.html', 'w', encoding='utf-8').write(header + tag('table', rows))
-genws([(src, trg) for (src, trg, srcLang) in scurlExamples('pan') if srcLang == 'es'])
+
+genws(get_examples(2, 'pan', 'desayuno', 'queso'))
