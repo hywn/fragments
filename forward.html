@@ -1,0 +1,33 @@
+<pre id="main"></pre>
+
+<style>
+body { display: flex; align-items: center; justify-content: center }
+
+#main { background-color: #eee; font-size: 2em; padding: 2em; transform: rotate(0.5turn) }
+</style>
+
+<script>
+const MAIN = document.querySelector('#main')
+
+function updateTime()
+{
+	const date = new Date()
+
+	main.innerText = [date.getHours(), date.getMinutes(), date.getSeconds()]
+		.map(n => n.toString().padStart(2, ' '))
+		.join('\n')
+}
+
+function to4bars(num, blocks, interval)
+{
+	const subinterval = interval / blocks.length
+
+	const curr_block = Math.floor(num / subinterval)
+	const num_blocks = num % subinterval
+
+	return blocks[curr_block].repeat(num_blocks)
+		+ (blocks[curr_block - 1] || ' ').repeat(subinterval - num_blocks)
+}
+
+setInterval(updateTime, 500)
+</script>

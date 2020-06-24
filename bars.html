@@ -1,0 +1,40 @@
+<pre id="main"></pre>
+
+<style>
+body { display: flex; align-items: center; justify-content: center }
+
+#main { background-color: #eee; font-size: 2em; padding: 2em }
+</style>
+
+<script>
+const MAIN = document.querySelector('#main')
+
+const INTERVALS = [60, 60, 24]
+const BLOCKS = [
+	['▁', '▂', '▄', '▆', '█'],
+	['▁', '▂', '▄', '▆', '█'],
+	['▄','█']
+]
+
+function updateTime()
+{
+	const date = new Date()
+
+	main.innerHTML = [date.getSeconds(), date.getMinutes(), date.getHours()]
+		.map((num, i) => to4bars(num, BLOCKS[i], INTERVALS[i]) + ' ' + num.toString(12).padStart(2, '0'))
+		.join('\n')
+}
+
+function to4bars(num, blocks, interval)
+{
+	const subinterval = interval / blocks.length
+
+	const curr_block = Math.floor(num / subinterval)
+	const num_blocks = num % subinterval
+
+	return blocks[curr_block].repeat(num_blocks)
+		+ (blocks[curr_block - 1] || ' ').repeat(subinterval - num_blocks)
+}
+
+setInterval(updateTime, 500)
+</script>
