@@ -1,0 +1,20 @@
+<script>;(async () => {
+
+const WORKAROUND_URL       = 'https://www.cs.virginia.edu/~jh7qbe/test.php'
+const WEATHERSTACK_API_KEY = '9d8b84375be89a9f988186941277d0c1'
+
+const get =
+	url =>
+		fetch(`${WORKAROUND_URL}?url=${encodeURIComponent(url)}`)
+			.then(r => r.json())
+
+// ideally would use HTTPS but since using workaround anyways (which doesnt care) doesnt rlly matter ig
+const get_query =
+	query =>
+		get(`http://api.weatherstack.com/current?access_key=${WEATHERSTACK_API_KEY}&query=${query}`)
+
+const all_countries = await get('https://restcountries.eu/rest/v2/all')
+
+console.log(all_countries)
+
+})();</script>
