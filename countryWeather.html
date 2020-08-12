@@ -24,7 +24,7 @@ const query_weatherstack =
 // given a string, queries weatherstack with the string
 // returns a nice weather display
 const country_weather = async query => {
-	const response = await weatherstack(query)
+	const response = await query_weatherstack(query)
 
 	if (!response.current) return 'uh oh something went wrong!!!'
 
