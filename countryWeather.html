@@ -1,4 +1,10 @@
-<script>;(async () => {
+<h1>weather :)</h1>
+<input id='input' type='text' placeholder='filter by country name' />
+<div id='results'></div>
+
+<script>
+const INPUT   = document.querySelector('#input')
+const RESULTS = document.querySelector('#results')
 
 // get a url
 const WORKAROUND_URL = 'https://www.cs.virginia.edu/~jh7qbe/test.php'
@@ -9,11 +15,58 @@ const get =
 const WEATHERSTACK_API_URL = 'http://api.weatherstack.com/current' // ideally would use HTTPS but since using workaround anyways (which doesnt care) doesnt rlly matter ig
 const WEATHERSTACK_API_KEY = '9d8b84375be89a9f988186941277d0c1'
 const weatherstack =
-	query => get(`${WEATHERSTACK_API_URL}?access_key=${WEATHERSTACK_API_KEY}&query=${query}`)
+	query => get(`${WEATHERSTACK_API_URL}?access_key=${WEATHERSTACK_API_KEY}&query=${encodeURIComponent(query)}`)
+
+const input = text => {
+	INPUT.value = text
+	INPUT.dispatchEvent(new Event('input'))
+}
+
+;(async () => {
 
 // get all countries
 const all_countries = await get('https://restcountries.eu/rest/v2/all')
 
-console.log(all_countries)
+const country_info = ({ name, capital, population, languages, flag: flag_url }) => `
+	<h1>${name}</h1>
+	<p>capital: ${capital}</p>
+	<p>population: ${population}</p>
+	<h2>languages</h2>
+	<ul>${languages.map(({ name }) => `<li>${name}</li>`).join('')}</ul>
+	<p><img src='${flag_url}' height='100' alt='flag'></p>
+`
+const country_weather = async query => {
+	const response = await weatherstack(query)
+
+	if (!response.current) return 'uh oh something went wrong!!!'
+
+	const {
+		current: weather,
+		location: {
+			country,
+			name
+		}
+	} = response
+
+	return `
+		<h1>Weather in ${name}, ${country}</h1><br />
+		<strong>Temperature:</strong> ${weather.temperature} Celsius<br />
+		${weather.weather_icons.map(url => `<img src='${url}' width='80' alt='weather icon' />`).join('<br />')}<br />
+		<strong>wind:</strong> ${weather.wind_speed} km direction ${weather.wind_dir}
+	`
+}
+const country_list_item = ({ name }) => `<li>${name} <button onclick='input("${name}")'>show</button></li>`
+
+const show = async text => {
+	const lowerText = text.toLowerCase()
+	const countries = all_countries.filter(({ name }) => name.toLowerCase().includes(lowerText))
+
+	RESULTS.innerHTML = countries.length === 1
+		? country_info(countries[0]) + await country_weather(countries[0].capital)
+		: `<ul>${countries.map(country_list_item).join('')}</ul>`
+}
+
+INPUT.addEventListener('input', e => show(INPUT.value))
+show('')
 
 })();</script>
