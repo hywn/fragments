@@ -10,12 +10,12 @@ const RESULTS = document.querySelector('#results')
 /** bunch of queries and turning the query data into HTML displays **/
 /********************************************************************/
 
-// get a url
+// get a url from CORS workaround
 const WORKAROUND_URL = 'https://www.cs.virginia.edu/~jh7qbe/test.php'
 const get =
 	url => fetch(`${WORKAROUND_URL}?url=${encodeURIComponent(url)}`).then(r => r.json())
 
-// turns array of strings into a ul
+// turns array into a ul
 const list = array => `<ul>${array.map(x => `<li>${x}</li>`).join('')}</ul>`
 
 // query weatherstack
