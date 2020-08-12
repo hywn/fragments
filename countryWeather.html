@@ -6,6 +6,10 @@
 const INPUT   = document.querySelector('#input')
 const RESULTS = document.querySelector('#results')
 
+/********************************************************************/
+/** bunch of queries and turning the query data into HTML displays **/
+/********************************************************************/
+
 // get a url
 const WORKAROUND_URL = 'https://www.cs.virginia.edu/~jh7qbe/test.php'
 const get =
@@ -14,27 +18,11 @@ const get =
 // query weatherstack
 const WEATHERSTACK_API_URL = 'http://api.weatherstack.com/current' // ideally would use HTTPS but since using workaround anyways (which doesnt care) doesnt rlly matter ig
 const WEATHERSTACK_API_KEY = '9d8b84375be89a9f988186941277d0c1'
-const weatherstack =
+const query_weatherstack =
 	query => get(`${WEATHERSTACK_API_URL}?access_key=${WEATHERSTACK_API_KEY}&query=${encodeURIComponent(query)}`)
 
-const input = text => {
-	INPUT.value = text
-	INPUT.dispatchEvent(new Event('input'))
-}
-
-;(async () => {
-
-// get all countries
-const all_countries = await get('https://restcountries.eu/rest/v2/all')
-
-const country_info = ({ name, capital, population, languages, flag: flag_url }) => `
-	<h1>${name}</h1>
-	<p>capital: ${capital}</p>
-	<p>population: ${population}</p>
-	<h2>languages</h2>
-	<ul>${languages.map(({ name }) => `<li>${name}</li>`).join('')}</ul>
-	<p><img src='${flag_url}' height='100' alt='flag'></p>
-`
+// given a string, queries weatherstack with the string
+// returns a nice weather display
 const country_weather = async query => {
 	const response = await weatherstack(query)
 
@@ -42,10 +30,7 @@ const country_weather = async query => {
 
 	const {
 		current: weather,
-		location: {
-			country,
-			name
-		}
+		location: { country, name }
 	} = response
 
 	return `
@@ -55,18 +40,51 @@ const country_weather = async query => {
 		<strong>wind:</strong> ${weather.wind_speed} km direction ${weather.wind_dir}
 	`
 }
-const country_list_item = ({ name }) => `<li>${name} <button onclick='input("${name}")'>show</button></li>`
 
-const show = async text => {
-	const lowerText = text.toLowerCase()
-	const countries = all_countries.filter(({ name }) => name.toLowerCase().includes(lowerText))
+// query restcountries.eu
+const queried_restcountries = get('https://restcountries.eu/rest/v2/all')
 
-	RESULTS.innerHTML = countries.length === 1
-		? country_info(countries[0]) + await country_weather(countries[0].capital)
-		: `<ul>${countries.map(country_list_item).join('')}</ul>`
+// given 1 country from restcountries.eu
+// returns a nice info display
+const country_info = ({ name, capital, population, languages, flag: flag_url }) => `
+	<h1>${name}</h1>
+	<p>capital: ${capital}</p>
+	<p>population: ${population}</p>
+	<h2>languages</h2>
+	${list(languages.map(lang => lang.name))}
+	<p><img src='${flag_url}' height='100' alt='flag'></p>
+`
+/********************/
+/** actual code :) **/
+/********************/
+
+// emulate input into the input box
+const input = text => {
+	INPUT.value = text
+	INPUT.dispatchEvent(new Event('input'))
 }
 
-INPUT.addEventListener('input', e => show(INPUT.value))
-show('')
+// turns displays array of strings as an ul
+const list = array => `<ul>${array.map(x => `<li>${x}</li>`).join('')}</ul>`
 
-})();</script>
+;(async () => {
+	// gets all countries
+	const all_countries = await queried_restcountries
+
+	// displays filtered countries, or 1 country's info + weather
+	const show = async text => {
+		const countries = all_countries
+			.filter(({ name }) => name.toLowerCase().includes(text.toLowerCase()))
+
+		RESULTS.innerHTML = countries.length === 1
+			? country_info(countries[0]) + await country_weather(countries[0].capital)
+			: list(countries.map(({ name }) => `${name} <button onclick='input("${name}")'>show</button>`))
+	}
+
+	// filter countries when user inputs
+	INPUT.addEventListener('input', e => show(INPUT.value))
+
+	// display all countries
+	show('')
+})();
+</script>
